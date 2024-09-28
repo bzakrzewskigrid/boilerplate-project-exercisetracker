@@ -67,7 +67,55 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n   \"description\": \"full body workout\",\n   \"duration\": 5400,\n   \"date\": \"2024-09-26\"\n}",
+					"raw": "{\n   \"description\": \"full body workout\",\n   \"duration\": 5400,\n   \"date\": \"2024-01-04\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseUrl}}/users/1/exercises"
+			},
+			"response": []
+		},
+		{
+			"name": "Create exercise - duration in the wrong format",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"description\": \"full body workout\",\n   \"duration\": -1,\n   \"date\": \"2024-09-26\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseUrl}}/users/1/exercises"
+			},
+			"response": []
+		},
+		{
+			"name": "Create exercise - duration in the wrong format 2",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"description\": \"full body workout\",\n   \"duration\": \"abc\",\n   \"date\": \"2024-09-26\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -92,6 +140,30 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n   \"description\": \"full body workout\",\n   \"duration\": 5400,\n   \"date\": \"2024-05-50\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseUrl}}/users/1/exercises"
+			},
+			"response": []
+		},
+		{
+			"name": "Create exercise - date in wrong format Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"description\": \"full body workout\",\n   \"duration\": 5400,\n   \"date\": \"123\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -193,12 +265,45 @@
 			"response": []
 		},
 		{
-			"name": "Get logs - with params 1",
+			"name": "Get logs - with params",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/users/1/logs?limit=10&from=2024-05-25&to=2024-09-26",
+					"raw": "{{baseUrl}}/users/1/logs?limit=2&from=2024-01-01&to=2024-01-04",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"1",
+						"logs"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2"
+						},
+						{
+							"key": "from",
+							"value": "2024-01-01"
+						},
+						{
+							"key": "to",
+							"value": "2024-01-04"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get logs - with params - wrong format",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/1/logs?limit=10&from=2024-05-44&to=2024-09-26",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -214,11 +319,86 @@
 						},
 						{
 							"key": "from",
-							"value": "2024-05-25"
+							"value": "2024-05-44"
 						},
 						{
 							"key": "to",
 							"value": "2024-09-26"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get logs - with params - wrong format 2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/1/logs?to=123",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"1",
+						"logs"
+					],
+					"query": [
+						{
+							"key": "to",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get logs - with params - wrong format 3",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/1/logs?limit=abc",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"1",
+						"logs"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "abc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get logs - with params - wrong format 3 Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/1/logs?limit=-3",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"1",
+						"logs"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "-3"
 						}
 					]
 				}
