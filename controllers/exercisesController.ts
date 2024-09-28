@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import { getDB } from '../src/initDb';
 import { CreatedExerciseResponse } from '../models/models';
 import { formatDate, getResponseWhenServerFailed, isNumber, isValidDate } from '../util';
-
-const db = getDB();
+import { db } from '../src/initDb';
 
 export const createExercise = async (req: Request, res: Response) => {
   const userId = req.params._id;

@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
-import { getDB } from '../src/initDb';
 import { CustomError } from '../types';
 import { User } from '../models/models';
 import { getResponseWhenServerFailed } from '../util';
-
-const db = getDB();
+import { db } from '../src/initDb';
 
 export const createUser = async (req: Request, res: Response) => {
   const { username } = req.body;

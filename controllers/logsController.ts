@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import { getDB } from '../src/initDb';
 import { Exercise, User } from '../models/models';
 import { getResponseWhenServerFailed } from '../util';
-
-const db = getDB();
+import { db } from '../src/initDb';
 
 // todo: Add params validity:
 // todo: check: if limit is a number,  if from and to dates are correctly formatted
