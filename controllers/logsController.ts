@@ -1,11 +1,8 @@
 import { Request, Response } from 'express';
 import { Exercise, User } from '../models/models';
-import { getResponseWhenServerFailed } from '../util';
+import { getResponseWhenServerFailed, isNumber, isNumeric, isValidDate } from '../util';
 import { db } from '../src/initDb';
 
-// todo: Add params validity:
-// todo: check: if limit is a number,  if from and to dates are correctly formatted
-// todo: and if 'to' date is > then 'from' date
 export const getLogs = async (req: Request, res: Response) => {
   const userId = req.params._id;
 
@@ -29,6 +26,31 @@ export const getLogs = async (req: Request, res: Response) => {
     );
 
     const { from, to, limit } = req.query;
+
+    console.log(limit);
+
+    if (limit && !isNumeric(limit as string)) {
+      console.log(limit);
+      return res.status(400).json({
+        message: 'Limit is in the wrong format!',
+      });
+    } else if (limit && +limit <= 0) {
+      return res.status(400).json({
+        message: 'Limit cannot be less then 0!',
+      });
+    }
+
+    if (from && !isValidDate(from as string)) {
+      return res.status(400).json({
+        message: "'From' date is in the wrong format!",
+      });
+    }
+
+    if (to && !isValidDate(to as string)) {
+      return res.status(400).json({
+        message: "'To' date is in the wrong format!",
+      });
+    }
 
     if (limit) {
       userExerciseLogs = userExerciseLogs.slice(0, +limit);
