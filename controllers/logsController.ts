@@ -39,26 +39,67 @@ export const getLogs = async (req: Request, res: Response) => {
       });
     }
 
-    let userExerciseLogs: Exercise[] = await db.all(
-      `
-      SELECT 
-      Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
-      ON (Users.id = Exercises.userId) 
-      WHERE Users.id = ?
-      ORDER BY
-			Exercises.date ASC
-      ${limit ? 'LIMIT ?' : ''}
-    `,
-      userId,
-      limit
-    );
+    let userExerciseLogs: Exercise[];
 
-    if (from) {
-      userExerciseLogs = userExerciseLogs.filter((exercise) => new Date(exercise.date) >= new Date(from as string));
-    }
-
-    if (to) {
-      userExerciseLogs = userExerciseLogs.filter((exercise) => new Date(exercise.date) <= new Date(to as string));
+    if (from && to) {
+      userExerciseLogs = await db.all(
+        `
+        SELECT 
+        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
+        ON (Users.id = Exercises.userId) 
+        WHERE Users.id = ?
+        AND Exercises.date BETWEEN ? AND ?
+        ORDER BY Exercises.date ASC
+        ${limit ? 'LIMIT ?' : ''}
+        `,
+        userId,
+        from,
+        to,
+        limit
+      );
+    } else if (from) {
+      userExerciseLogs = await db.all(
+        `
+        SELECT 
+        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
+        ON (Users.id = Exercises.userId) 
+        WHERE Users.id = ?
+        AND Exercises.date >= ?
+        ORDER BY Exercises.date ASC
+        ${limit ? 'LIMIT ?' : ''}
+        `,
+        userId,
+        from,
+        limit
+      );
+    } else if (to) {
+      userExerciseLogs = await db.all(
+        `
+        SELECT 
+        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
+        ON (Users.id = Exercises.userId) 
+        WHERE Users.id = ?
+        AND Exercises.date <= ?
+        ORDER BY Exercises.date ASC
+        ${limit ? 'LIMIT ?' : ''}
+        `,
+        userId,
+        to,
+        limit
+      );
+    } else {
+      userExerciseLogs = await db.all(
+        `
+        SELECT 
+        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
+        ON (Users.id = Exercises.userId) 
+        WHERE Users.id = ?
+        ORDER BY Exercises.date ASC
+        ${limit ? 'LIMIT ?' : ''}
+        `,
+        userId,
+        limit
+      );
     }
 
     const username = user.username;

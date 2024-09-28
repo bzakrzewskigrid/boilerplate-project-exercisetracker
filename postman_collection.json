@@ -298,6 +298,35 @@
 			"response": []
 		},
 		{
+			"name": "Get logs - with params 2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/1/logs?from=2024-01-01&limit=3",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"1",
+						"logs"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "2024-01-01"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get logs - with params - wrong format",
 			"request": {
 				"method": "GET",
