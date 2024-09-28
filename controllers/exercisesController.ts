@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import { getDB } from '../src/initDb';
 import { CreatedExerciseResponse } from '../models/models';
-import { formatDate, getResponseWhenServerFailed } from '../util';
+import { formatDate, getResponseWhenServerFailed, isNumber, isValidDate } from '../util';
 
 const db = getDB();
 
-// todo: Add body validity (with some kind of library):
-// todo: check: date format and if duration is a number,
 export const createExercise = async (req: Request, res: Response) => {
   const userId = req.params._id;
 
@@ -30,6 +28,22 @@ export const createExercise = async (req: Request, res: Response) => {
     if (!duration) {
       return res.status(400).json({
         message: 'No duration provided!',
+      });
+    }
+
+    if (!isNumber(duration)) {
+      return res.status(400).json({
+        message: 'Duration is in the wrong format!',
+      });
+    } else if (duration <= 0) {
+      return res.status(400).json({
+        message: 'Duration cannot be less then 0!',
+      });
+    }
+
+    if (!isValidDate(date)) {
+      return res.status(400).json({
+        message: 'Date is in the wrong format!',
       });
     }
 
