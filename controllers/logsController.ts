@@ -15,22 +15,9 @@ export const getLogs = async (req: Request, res: Response) => {
       });
     }
 
-    let userExerciseLogs: Exercise[] = await db.all(
-      `
-      SELECT 
-      Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
-      ON (Users.id = Exercises.userId) 
-      WHERE Users.id = ?
-    `,
-      userId
-    );
-
     const { from, to, limit } = req.query;
 
-    console.log(limit);
-
     if (limit && !isNumeric(limit as string)) {
-      console.log(limit);
       return res.status(400).json({
         message: 'Limit is in the wrong format!',
       });
@@ -52,9 +39,19 @@ export const getLogs = async (req: Request, res: Response) => {
       });
     }
 
-    if (limit) {
-      userExerciseLogs = userExerciseLogs.slice(0, +limit);
-    }
+    let userExerciseLogs: Exercise[] = await db.all(
+      `
+      SELECT 
+      Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
+      ON (Users.id = Exercises.userId) 
+      WHERE Users.id = ?
+      ORDER BY
+			Exercises.date ASC
+      ${limit ? 'LIMIT ?' : ''}
+    `,
+      userId,
+      limit
+    );
 
     if (from) {
       userExerciseLogs = userExerciseLogs.filter((exercise) => new Date(exercise.date) >= new Date(from as string));
@@ -65,7 +62,9 @@ export const getLogs = async (req: Request, res: Response) => {
     }
 
     const username = user.username;
-    const count = userExerciseLogs.length;
+
+    const selectCount: { count: number } = await db.get('SELECT COUNT(id) as count FROM Exercises');
+    const { count } = selectCount;
 
     return res.status(201).json({
       message: "User's exercises fetched successfully",
