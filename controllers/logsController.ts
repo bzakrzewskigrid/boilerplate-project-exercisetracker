@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { Exercise, User } from '../models/models';
-import { getResponseWhenServerFailed, isNumber, isNumeric, isValidDate } from '../util';
+import { getResponseWhenServerFailed } from '../util';
 import { db } from '../src/initDb';
+import { validateIfCorrectDateFormat, validateIfPositiveNumber } from '../validators';
 
 export const getLogs = async (req: Request, res: Response) => {
   const userId = req.params._id;
@@ -17,26 +18,16 @@ export const getLogs = async (req: Request, res: Response) => {
 
     const { from, to, limit } = req.query;
 
-    if (limit && !isNumeric(limit as string)) {
-      return res.status(400).json({
-        message: 'Limit is in the wrong format!',
-      });
-    } else if (limit && +limit <= 0) {
-      return res.status(400).json({
-        message: 'Limit cannot be less then 0!',
-      });
+    if (limit && validateIfPositiveNumber(limit, 'limit', res)) {
+      return;
     }
 
-    if (from && !isValidDate(from as string)) {
-      return res.status(400).json({
-        message: "'From' date is in the wrong format!",
-      });
+    if (from && validateIfCorrectDateFormat(from, "'From' date", res)) {
+      return;
     }
 
-    if (to && !isValidDate(to as string)) {
-      return res.status(400).json({
-        message: "'To' date is in the wrong format!",
-      });
+    if (to && validateIfCorrectDateFormat(to, "'To' date", res)) {
+      return;
     }
 
     let userExerciseLogs: Exercise[];

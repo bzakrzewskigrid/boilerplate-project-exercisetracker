@@ -4,6 +4,10 @@ export const formatDate = (date: Date) => {
   return date.toISOString().split('T')[0];
 };
 
+export function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export const getResponseWhenServerFailed = (res: Response) => {
   return res.status(500).json({
     message: 'Something went wrong. Please try again later',
@@ -20,7 +24,7 @@ export function isNumeric(str: string) {
 }
 
 // https://stackoverflow.com/questions/18758772/how-do-i-validate-a-date-in-this-format-yyyy-mm-dd-using-jquery
-export function isValidDate(dateString: string) {
+export function isValidDateYYYYMMDD(dateString: string) {
   const regEx = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateString.match(regEx)) {
     return false;

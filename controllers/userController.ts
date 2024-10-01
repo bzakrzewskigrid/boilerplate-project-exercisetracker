@@ -3,14 +3,13 @@ import { CustomError } from '../types';
 import { User } from '../models/models';
 import { getResponseWhenServerFailed } from '../util';
 import { db } from '../src/initDb';
+import { validateIfEmpty } from '../validators';
 
 export const createUser = async (req: Request, res: Response) => {
   const { username } = req.body;
 
-  if (!username || !username.trim()) {
-    return res.status(400).json({
-      message: 'No username provided!',
-    });
+  if (validateIfEmpty(username, 'username', res)) {
+    return;
   }
 
   let transformedUserName = username.trim();
@@ -19,6 +18,7 @@ export const createUser = async (req: Request, res: Response) => {
     const result = await db.run('INSERT INTO Users (username) VALUES (?)', transformedUserName);
 
     const createdUserId = result.lastID;
+
     const user: User = {
       id: createdUserId,
       username: transformedUserName,
