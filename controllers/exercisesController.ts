@@ -60,7 +60,7 @@ export const createExercise = async (req: Request, res: Response) => {
     const createdExercise: CreatedExerciseResponse = {
       userId: +userId,
       exerciseId: result.lastID,
-      duration: duration,
+      duration: transformedDuration,
       description: transformedDescription,
       date: transformedDate,
     };
