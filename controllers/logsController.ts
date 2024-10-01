@@ -30,117 +30,69 @@ export const getLogs = async (req: Request, res: Response) => {
       return;
     }
 
+    const selectLogsSqlStr = `
+    SELECT 
+    Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
+    ON (Users.id = Exercises.userId) 
+    WHERE Users.id = ?
+    ${
+      from && to
+        ? 'AND Exercises.date BETWEEN ? AND ?'
+        : from
+        ? 'AND Exercises.date >= ?'
+        : to
+        ? 'AND Exercises.date <= ?'
+        : ''
+    }
+    ORDER BY Exercises.date ASC
+    ${limit ? 'LIMIT ?' : ''}
+    `;
+
     let userExerciseLogs: Exercise[];
 
     if (from && to) {
-      userExerciseLogs = await db.all(
-        `
-        SELECT 
-        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
-        ON (Users.id = Exercises.userId) 
-        WHERE Users.id = ?
-        AND Exercises.date BETWEEN ? AND ?
-        ORDER BY Exercises.date ASC
-        ${limit ? 'LIMIT ?' : ''}
-        `,
-        userId,
-        from,
-        to,
-        limit
-      );
+      userExerciseLogs = await db.all(selectLogsSqlStr, userId, from, to, limit);
     } else if (from) {
-      userExerciseLogs = await db.all(
-        `
-        SELECT 
-        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
-        ON (Users.id = Exercises.userId) 
-        WHERE Users.id = ?
-        AND Exercises.date >= ?
-        ORDER BY Exercises.date ASC
-        ${limit ? 'LIMIT ?' : ''}
-        `,
-        userId,
-        from,
-        limit
-      );
+      userExerciseLogs = await db.all(selectLogsSqlStr, userId, from, limit);
     } else if (to) {
-      userExerciseLogs = await db.all(
-        `
-        SELECT 
-        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
-        ON (Users.id = Exercises.userId) 
-        WHERE Users.id = ?
-        AND Exercises.date <= ?
-        ORDER BY Exercises.date ASC
-        ${limit ? 'LIMIT ?' : ''}
-        `,
-        userId,
-        to,
-        limit
-      );
+      userExerciseLogs = await db.all(selectLogsSqlStr, userId, to, limit);
     } else {
-      userExerciseLogs = await db.all(
-        `
-        SELECT 
-        Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
-        ON (Users.id = Exercises.userId) 
-        WHERE Users.id = ?
-        ORDER BY Exercises.date ASC
-        ${limit ? 'LIMIT ?' : ''}
-        `,
-        userId,
-        limit
-      );
+      userExerciseLogs = await db.all(selectLogsSqlStr, userId, limit);
     }
 
     const username = user.username;
 
+    const selectCountSqlStr = `
+      SELECT COUNT(id) as count FROM Exercises 
+      WHERE Exercises.userId = ?
+       ${
+         from && to
+           ? 'AND Exercises.date BETWEEN ? AND ?'
+           : from
+           ? 'AND Exercises.date >= ?'
+           : to
+           ? 'AND Exercises.date <= ?'
+           : ''
+       }
+    `;
+
     let selectCount: { count: number };
 
     if (from && to) {
-      selectCount = await db.get(
-        `
-        SELECT COUNT(id) as count FROM Exercises 
-        WHERE Exercises.userId = ?
-        AND Exercises.date BETWEEN ? AND ?`,
-        user.id,
-        from,
-        to
-      );
+      selectCount = await db.get(selectCountSqlStr, userId, from, to);
     } else if (from) {
-      selectCount = await db.get(
-        `
-        SELECT COUNT(id) as count FROM Exercises 
-        WHERE Exercises.userId = ?
-        AND Exercises.date >= ?`,
-        user.id,
-        from
-      );
+      selectCount = await db.get(selectCountSqlStr, userId, from);
     } else if (to) {
-      selectCount = await db.get(
-        `
-        SELECT COUNT(id) as count FROM Exercises 
-        WHERE Exercises.userId = ?
-        AND Exercises.date <= ?`,
-        user.id,
-        to
-      );
+      selectCount = await db.get(selectCountSqlStr, userId, to);
     } else {
-      selectCount = await db.get(
-        `
-        SELECT COUNT(id) as count FROM Exercises 
-        WHERE Exercises.userId = ?`,
-        user.id
-      );
+      selectCount = await db.get(selectCountSqlStr, userId);
     }
-
-    const { count } = selectCount;
 
     return res.status(201).json({
       message: "User's exercises fetched successfully",
       username: username,
       logs: userExerciseLogs,
-      count: count,
+      count: selectCount.count,
     });
   } catch (err) {
     return getResponseWhenServerFailed(res);
