@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { CreatedExerciseResponse } from '../models/models';
-import { formatDate, getResponseWhenServerFailed, isNumber, isValidDate } from '../util';
+import { formatDate, getResponseWhenServerFailed, isNumber, isNumeric, isValidDate } from '../util';
 import { db } from '../src/initDb';
 
 export const createExercise = async (req: Request, res: Response) => {
@@ -29,13 +29,13 @@ export const createExercise = async (req: Request, res: Response) => {
       });
     }
 
-    if (!isNumber(duration)) {
+    if (!isNumeric(duration)) {
       return res.status(400).json({
         message: 'Duration is in the wrong format!',
       });
-    } else if (duration <= 0) {
+    } else if (+duration <= 0) {
       return res.status(400).json({
-        message: 'Duration cannot be less then 0!',
+        message: 'Duration cannot be less or equal to 0!',
       });
     }
 
@@ -47,11 +47,12 @@ export const createExercise = async (req: Request, res: Response) => {
 
     let transformedDescription = description.trim();
     let transformedDate = date || formatDate(new Date());
+    let transformedDuration = +duration;
 
     const result = await db.run(
       'INSERT INTO Exercises (description, duration, date, userId) VALUES (?, ?, ?, ?)',
       transformedDescription,
-      duration,
+      transformedDuration,
       transformedDate,
       userId
     );
