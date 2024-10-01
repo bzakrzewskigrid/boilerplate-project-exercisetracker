@@ -104,12 +104,45 @@ export const getLogs = async (req: Request, res: Response) => {
 
     const username = user.username;
 
-    const selectCount: { count: number } = await db.get(
-      `
-      SELECT COUNT(id) as count FROM Exercises 
-      WHERE Exercises.userId = ?`,
-      user.id
-    );
+    let selectCount: { count: number };
+
+    if (from && to) {
+      selectCount = await db.get(
+        `
+        SELECT COUNT(id) as count FROM Exercises 
+        WHERE Exercises.userId = ?
+        AND Exercises.date BETWEEN ? AND ?`,
+        user.id,
+        from,
+        to
+      );
+    } else if (from) {
+      selectCount = await db.get(
+        `
+        SELECT COUNT(id) as count FROM Exercises 
+        WHERE Exercises.userId = ?
+        AND Exercises.date >= ?`,
+        user.id,
+        from
+      );
+    } else if (to) {
+      selectCount = await db.get(
+        `
+        SELECT COUNT(id) as count FROM Exercises 
+        WHERE Exercises.userId = ?
+        AND Exercises.date <= ?`,
+        user.id,
+        to
+      );
+    } else {
+      selectCount = await db.get(
+        `
+        SELECT COUNT(id) as count FROM Exercises 
+        WHERE Exercises.userId = ?`,
+        user.id
+      );
+    }
+
     const { count } = selectCount;
 
     return res.status(201).json({
