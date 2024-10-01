@@ -39,7 +39,7 @@ export const createExercise = async (req: Request, res: Response) => {
       });
     }
 
-    if (!isValidDate(date)) {
+    if (date && !isValidDate(date)) {
       return res.status(400).json({
         message: 'Date is in the wrong format!',
       });
