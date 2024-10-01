@@ -104,7 +104,12 @@ export const getLogs = async (req: Request, res: Response) => {
 
     const username = user.username;
 
-    const selectCount: { count: number } = await db.get('SELECT COUNT(id) as count FROM Exercises');
+    const selectCount: { count: number } = await db.get(
+      `
+      SELECT COUNT(id) as count FROM Exercises 
+      WHERE Exercises.userId = ?`,
+      user.id
+    );
     const { count } = selectCount;
 
     return res.status(201).json({
