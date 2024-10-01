@@ -48,45 +48,30 @@ export const getLogs = async (req: Request, res: Response) => {
     ${limit ? 'LIMIT ?' : ''}
     `;
 
-    let userExerciseLogs: Exercise[];
+    const paramsArr: string[] = [];
 
-    if (from && to) {
-      userExerciseLogs = await db.all(selectLogsSqlStr, userId, from, to, limit);
-    } else if (from) {
-      userExerciseLogs = await db.all(selectLogsSqlStr, userId, from, limit);
-    } else if (to) {
-      userExerciseLogs = await db.all(selectLogsSqlStr, userId, to, limit);
-    } else {
-      userExerciseLogs = await db.all(selectLogsSqlStr, userId, limit);
-    }
+    const query = [from, to];
+    query.forEach((param) => param && paramsArr.push(param.toString()));
+
+    const userExerciseLogs: Exercise[] = await db.all(selectLogsSqlStr, userId, ...paramsArr, limit);
 
     const username = user.username;
 
     const selectCountSqlStr = `
-      SELECT COUNT(id) as count FROM Exercises 
-      WHERE Exercises.userId = ?
-       ${
-         from && to
-           ? 'AND Exercises.date BETWEEN ? AND ?'
-           : from
-           ? 'AND Exercises.date >= ?'
-           : to
-           ? 'AND Exercises.date <= ?'
-           : ''
-       }
+    SELECT COUNT(id) as count FROM Exercises 
+    WHERE Exercises.userId = ?
+      ${
+        from && to
+          ? 'AND Exercises.date BETWEEN ? AND ?'
+          : from
+          ? 'AND Exercises.date >= ?'
+          : to
+          ? 'AND Exercises.date <= ?'
+          : ''
+      }
     `;
 
-    let selectCount: { count: number };
-
-    if (from && to) {
-      selectCount = await db.get(selectCountSqlStr, userId, from, to);
-    } else if (from) {
-      selectCount = await db.get(selectCountSqlStr, userId, from);
-    } else if (to) {
-      selectCount = await db.get(selectCountSqlStr, userId, to);
-    } else {
-      selectCount = await db.get(selectCountSqlStr, userId);
-    }
+    let selectCount: { count: number } = await db.get(selectCountSqlStr, userId, ...paramsArr);
 
     return res.status(201).json({
       message: "User's exercises fetched successfully",
