@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { CreatedExerciseResponse } from '../models/models';
-import { formatDate, getResponseWhenServerFailed } from '../util';
+import { formatDateToYYYYMMDDString, getResponseWhenServerFailed } from '../util';
 import { db } from '../src/initDb';
 import { validateIfCorrectDateFormat, validateIfEmpty, validateIfPositiveNumber } from '../validators';
 
@@ -31,7 +31,7 @@ export const createExercise = async (req: Request, res: Response) => {
     }
 
     let transformedDescription = description.toString().trim();
-    let transformedDate = date ? date.toString() : formatDate(new Date());
+    let transformedDate = date ? date.toString() : formatDateToYYYYMMDDString(new Date());
     let transformedDuration = +duration;
 
     const result = await db.run(
