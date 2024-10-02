@@ -16,18 +16,11 @@ export const getLogs = async (req: Request, res: Response) => {
 
     const { from, to, limit } = req.query;
 
-    if (limit && validateIfPositiveNumber(limit, 'limit', res)) {
+    if (isAnyLogParamInvalid(req, res)) {
       return;
     }
 
-    if (from && validateIfCorrectDateFormat(from, "'From' date", res)) {
-      return;
-    }
-
-    if (to && validateIfCorrectDateFormat(to, "'To' date", res)) {
-      return;
-    }
-
+    // todo: extract this to another getSelectLogsSql function
     const selectLogsSqlStr = `
     SELECT 
     Exercises.id, Exercises.description, Exercises.duration, Exercises.date FROM Exercises JOIN Users 
@@ -77,4 +70,23 @@ export const getLogs = async (req: Request, res: Response) => {
   } catch (err) {
     return getResponseWhenServerFailed(res);
   }
+};
+
+// todo: replace ifs with switch
+const isAnyLogParamInvalid = (req: Request, res: Response) => {
+  const { from, to, limit } = req.query;
+
+  if (limit && validateIfPositiveNumber(limit, 'limit', res)) {
+    return true;
+  }
+
+  if (from && validateIfCorrectDateFormat(from, "'From' date", res)) {
+    return true;
+  }
+
+  if (to && validateIfCorrectDateFormat(to, "'To' date", res)) {
+    return true;
+  }
+
+  return false;
 };

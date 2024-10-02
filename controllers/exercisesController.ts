@@ -16,15 +16,7 @@ export const createExercise = async (req: Request, res: Response) => {
 
     const { description, duration, date } = req.body;
 
-    if (validateIfEmpty(description, 'description', res)) {
-      return;
-    }
-
-    if (validateIfEmpty(duration, 'duration', res) || validateIfPositiveNumber(duration, 'duration', res)) {
-      return;
-    }
-
-    if (date && validateIfCorrectDateFormat(date, 'date', res)) {
+    if (isAnyCreateExerciseBodyParamsInValid(req, res)) {
       return;
     }
 
@@ -54,4 +46,23 @@ export const createExercise = async (req: Request, res: Response) => {
   } catch (err) {
     return getResponseWhenServerFailed(res);
   }
+};
+
+// todo: replace ifs with switch
+const isAnyCreateExerciseBodyParamsInValid = (req: Request, res: Response) => {
+  const { description, duration, date } = req.body;
+
+  if (validateIfEmpty(description, 'description', res)) {
+    return true;
+  }
+
+  if (validateIfEmpty(duration, 'duration', res) || validateIfPositiveNumber(duration, 'duration', res)) {
+    return true;
+  }
+
+  if (date && validateIfCorrectDateFormat(date, 'date', res)) {
+    return true;
+  }
+
+  return false;
 };
