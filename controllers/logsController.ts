@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Exercise, User } from '../models/models';
+import { Exercise, User, UserExerciseLog } from '../models/User';
 import { getResponseWhenServerFailed, getResponseWhenUserDoesNotExist } from '../util';
 import { db } from '../src/initDb';
 import { validateIfCorrectDateFormat, validateIfPositiveNumber } from '../validators';
@@ -47,13 +47,9 @@ export const getLogs = async (req: Request, res: Response) => {
     `;
 
     const paramsArr: string[] = [];
-
-    const query = [from, to];
-    query.forEach((param) => param && paramsArr.push(param.toString()));
+    [from, to].forEach((param) => param && paramsArr.push(param.toString()));
 
     const userExerciseLogs: Exercise[] = await db.all(selectLogsSqlStr, userId, ...paramsArr, limit);
-
-    const username = user.username;
 
     const selectCountSqlStr = `
     SELECT COUNT(id) as count FROM Exercises 
@@ -69,14 +65,15 @@ export const getLogs = async (req: Request, res: Response) => {
       }
     `;
 
-    let selectCount: { count: number } = await db.get(selectCountSqlStr, userId, ...paramsArr);
+    const selectCount: { count: number } = await db.get(selectCountSqlStr, userId, ...paramsArr);
 
     return res.status(201).json({
       message: "User's exercises fetched successfully",
-      username: username,
+      id: user.id,
+      username: user.username,
       logs: userExerciseLogs,
       count: selectCount.count,
-    });
+    } as UserExerciseLog & { message: string });
   } catch (err) {
     return getResponseWhenServerFailed(res);
   }

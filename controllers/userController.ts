@@ -1,32 +1,29 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../types';
-import { User } from '../models/models';
 import { getResponseWhenServerFailed } from '../util';
 import { db } from '../src/initDb';
 import { validateIfEmpty } from '../validators';
+import { User } from '../models/User';
+import { RunResult } from 'sqlite3';
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const { username } = req.body;
 
   if (validateIfEmpty(username, 'username', res)) {
     return;
   }
 
-  let transformedUserName = username.trim();
+  const transformedUserName = username.trim();
 
   try {
-    const result = await db.run('INSERT INTO Users (username) VALUES (?)', transformedUserName);
-
-    const createdUserId = result.lastID;
-
-    const user: User = {
-      id: createdUserId,
-      username: transformedUserName,
-    };
+    const result: RunResult = await db.run('INSERT INTO Users (username) VALUES (?)', transformedUserName);
 
     return res.status(201).json({
       message: 'User created',
-      user: user,
+      user: {
+        id: result.lastID,
+        username: transformedUserName,
+      } as User,
     });
   } catch (err) {
     const error = err as CustomError;

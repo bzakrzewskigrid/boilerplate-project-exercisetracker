@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { User } from './models/models';
+import { User } from './models/User';
 
 export const formatDateToYYYYMMDDString = (date: Date): string => {
   return date.toISOString().split('T')[0];

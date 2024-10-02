@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { capitalizeFirstLetter, isNumeric, isStringContainingOnlyWhiteSpace, isValidDateYYYYMMDD } from './util';
 
+// validateIfEmptyAndSendResponse
 export const validateIfEmpty = (param: any, name: string, res: Response) => {
   if (!param || (typeof param === 'string' && isStringContainingOnlyWhiteSpace(param))) {
     return res.status(400).json({
