@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CreatedExerciseResponse } from '../models/models';
-import { formatDateToYYYYMMDDString, getResponseWhenServerFailed } from '../util';
+import { CreatedExerciseResponse, User } from '../models/models';
+import { formatDateToYYYYMMDDString, getResponseWhenServerFailed, getResponseWhenUserDoesNotExist } from '../util';
 import { db } from '../src/initDb';
 import { validateIfCorrectDateFormat, validateIfEmpty, validateIfPositiveNumber } from '../validators';
 
@@ -8,12 +8,10 @@ export const createExercise = async (req: Request, res: Response) => {
   const userId = req.params._id;
 
   try {
-    const user = await db.get('SELECT * FROM Users WHERE id = ?', userId);
+    const user: User | undefined = await db.get('SELECT * FROM Users WHERE id = ?', userId);
 
     if (!user) {
-      return res.status(400).json({
-        message: `User with ${userId} does not exist!`,
-      });
+      return getResponseWhenUserDoesNotExist(userId, res);
     }
 
     const { description, duration, date } = req.body;

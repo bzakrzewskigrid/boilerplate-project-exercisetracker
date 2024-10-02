@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Exercise, User } from '../models/models';
-import { getResponseWhenServerFailed } from '../util';
+import { getResponseWhenServerFailed, getResponseWhenUserDoesNotExist } from '../util';
 import { db } from '../src/initDb';
 import { validateIfCorrectDateFormat, validateIfPositiveNumber } from '../validators';
 
@@ -11,9 +11,7 @@ export const getLogs = async (req: Request, res: Response) => {
     const user: User = await db.get('SELECT * FROM Users WHERE id = ?', userId);
 
     if (!user) {
-      return res.status(400).json({
-        message: `User with id = ${userId} does not exist!`,
-      });
+      return getResponseWhenUserDoesNotExist(userId, res);
     }
 
     const { from, to, limit } = req.query;

@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { User } from './models/models';
 
 export const formatDateToYYYYMMDDString = (date: Date): string => {
   return date.toISOString().split('T')[0];
@@ -11,6 +12,12 @@ export function capitalizeFirstLetter(str: string): string {
 export const getResponseWhenServerFailed = (res: Response) => {
   return res.status(500).json({
     message: 'Something went wrong. Please try again later',
+  });
+};
+
+export const getResponseWhenUserDoesNotExist = (userId: string, res: Response) => {
+  return res.status(400).json({
+    message: `User with ${userId} does not exist!`,
   });
 };
 
